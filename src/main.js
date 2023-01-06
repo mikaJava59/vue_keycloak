@@ -1,48 +1,53 @@
-import { createApp } from 'vue'
-import App from './App.vue'
+//import { createApp } from 'vue'
+//import App from './App.vue'
 import Keycloak from "keycloak-js";
 
-createApp(App).mount('#app')
+//createApp(App).mount('#app')
 
-//hF7FPOfZiyHCew6u0Ru65dWmXsP82qrt
 
 let initOptions = {
     url: 'http://192.168.1.16:8080/',
     realm: 'authenticate_keycloak',
-    clientId: 'authenticate_keyclaok_vue',
-    clientSecret: 'hF7FPOfZiyHCew6u0Ru65dWmXsP82qrt',
+    clientId: 'authenticate_keycloak_api',
     onLoad: 'login-required'
 }
 
 let keycloak = Keycloak(initOptions);
-let Vue;
 
 keycloak.init({ onLoad: initOptions.onLoad }).then((auth) => {
     if (!auth) {
+        console.log("nom authentifié - creer la vue");
         window.location.reload();
     } else {
-        Vue.$log.info("Authenticated");
-        new Vue({
-            el: '#app',
-            render: h => h(App, { props: { keycloak: keycloak } })
-        })
-    }
+        console.log("load ok");
+        console.log(keycloak.token);
 
+        //Vue.$log.info("Authenticated");
+        // new Vue({
+        //     el: '#app',
+        //     render: h => h(App, { props: { keycloak: keycloak } })
+        // })
+    }
 
 //Token Refresh
     setInterval(() => {
+        console.log("dans set interval");
         keycloak.updateToken(70).then((refreshed) => {
             if (refreshed) {
-                Vue.$log.info('Token refreshed' + refreshed);
+                console.log("token refresh");
+                //Vue.$log.info('Token refreshed' + refreshed);
             } else {
-                Vue.$log.warn('Token not refreshed, valid for '
-                    + Math.round(keycloak.tokenParsed.exp + keycloak.timeSkew - new Date().getTime() / 1000) + ' seconds');
+                console.log("token not refresh");
+                //Vue.$log.warn('Token not refreshed, valid for '
+                //    + Math.round(keycloak.tokenParsed.exp + keycloak.timeSkew - new Date().getTime() / 1000) + ' seconds');
             }
         }).catch(() => {
-            Vue.$log.error('Failed to refresh token');
+            console.log("premier catch");
+            //Vue.$log.error('Failed to refresh token');
         });
     }, 6000)
 
 }).catch(() => {
-    Vue.$log.error("Authenticated Failed");
+    console.log("passage dans catch");
+    //Vue.$log.error("Authenticated Failed");
 });
